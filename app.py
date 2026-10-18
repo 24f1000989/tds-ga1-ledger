@@ -184,7 +184,7 @@ def get_metric(q):
     if re.search(r"\b(units|quantity|items sold|pieces sold)\b", q):
         return "units"
 
-    if re.search(r"\b(unique customers|distinct customers)\b", q):
+    if re.search(r"\b(unique|distinct|different)\s+(?:paying\s+)?customers?\b", q):
         return "customers"
 
     if re.search(
@@ -303,3 +303,4 @@ def health():
 @app.post("/")
 def ask(request: QuestionRequest):
     return {"answer": answer_question(request.question)}
+
