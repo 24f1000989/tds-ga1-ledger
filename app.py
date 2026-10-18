@@ -168,8 +168,11 @@ def get_metric(q):
     if re.search(r"\b(refund rate|refund percentage|percentage refunded)\b", q):
         return "refund_rate"
 
-    if re.search(r"\b(average order value|average revenue per order|aov)\b", q):
+    if re.search(r"\b(average|mean)\b", q) and re.search(r"\b(order|purchase|transaction|revenue)\b", q):
         return "average"
+
+    if re.search(r"\b(void|voided|cancelled|canceled)\b", q):
+        return "void_count"
 
     if re.search(
         r"\b(refund|refunded|refunds)\b", q
@@ -198,6 +201,9 @@ def get_metric(q):
 def calculate(orders, metric, q=""):
     paid = [o for o in orders if o["status"] == "paid"]
     refunded = [o for o in orders if o["status"] == "refunded"]
+
+    if metric == "void_count":
+        return sum(o["status"] == "void" for o in orders)
 
     if metric == "refund_count":
         return len(refunded)
@@ -303,5 +309,6 @@ def health():
 @app.post("/")
 def ask(request: QuestionRequest):
     return {"answer": answer_question(request.question)}
+
 
 
