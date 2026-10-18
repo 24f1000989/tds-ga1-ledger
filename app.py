@@ -88,10 +88,18 @@ def extract_dates(q):
 
         return start, end
 
-    quarter = re.search(r"\bq([1-4])\b|\b([1-4])(?:st|nd|rd|th)? quarter\b", q)
+    quarter = re.search(
+        r"\bq([1-4])\b"
+        r"|\b([1-4])(?:st|nd|rd|th)? quarter\b"
+        r"|\b(first|second|third|fourth) quarter\b",
+        q,
+    )
+
+    if re.search(r"\b(first three months|first 3 months)\b", q):
+        return date(year, 1, 1), date(year, 3, 31)
 
     if quarter:
-        number = int(quarter.group(1) or quarter.group(2))
+        number = int(quarter.group(1) or quarter.group(2)) if (quarter.group(1) or quarter.group(2)) else {"first": 1, "second": 2, "third": 3, "fourth": 4}[quarter.group(3)]
         first = (number - 1) * 3 + 1
         last = first + 2
 
@@ -225,7 +233,7 @@ def calculate(orders, metric, q=""):
         return len({o["customer"] for o in paid})
 
     if metric == "orders":
-        if re.search(r"\b(all orders|total orders placed|orders placed)\b", q):
+        if not re.search(r"\b(paid|successful|completed)\b", q) and re.search(r"\b(all orders|total orders placed|orders placed)\b", q):
             return len(orders)
         return len(paid)
 
@@ -309,6 +317,8 @@ def health():
 @app.post("/")
 def ask(request: QuestionRequest):
     return {"answer": answer_question(request.question)}
+
+
 
 
 
