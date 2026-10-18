@@ -1,0 +1,9 @@
+[project]
+name = "tds-ga1-ledger"
+version = "0.1.0"
+requires-python = ">=3.13"
+dependencies = [
+    "fastapi>=0.143.3",
+    "tzdata>=2026.5",
+    "uvicorn[standard]>=0.54.0",
+]
